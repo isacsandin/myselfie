@@ -2,10 +2,7 @@ package com.myselfie.myselfie.adapter;
 
 import java.util.List;
 
-import com.myselfie.myselfie.R;
-import com.myselfie.myselfie.model.VideoItem;
-import com.myselfie.utils.Utils;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.view.LayoutInflater;
@@ -15,6 +12,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.myselfie.myselfie.R;
+import com.myselfie.myselfie.model.VideoItem;
+import com.myselfie.utils.Utils;
+
+@SuppressLint("InflateParams")
 public class MasterDetailAdapter extends ArrayAdapter<VideoItem> {
 
 	private List<VideoItem> _list;
@@ -42,8 +44,6 @@ public class MasterDetailAdapter extends ArrayAdapter<VideoItem> {
 		Integer id = vidItem.get_id();
 
 		view.setId(id);
-		TextView tvTitle = (TextView) view.findViewById(R.id.text_name);
-		TextView tvPrice = (TextView) view.findViewById(R.id.text_price);
 		TextView tvDesc = (TextView) view.findViewById(R.id.text_desc);
 		ImageView iv = (ImageView) view.findViewById(R.id.image);
 
