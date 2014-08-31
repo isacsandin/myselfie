@@ -168,7 +168,7 @@ public class MainActivity extends FragmentActivity {
             // check for the OPENED state instead of session.isOpened() since for the
             // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
             if (state.equals(SessionState.OPENED)) {
-                showFragment(MAIN, true);
+                showFragment(MAIN, false);
                 Request request = Request.newMeRequest(session,new Request.GraphUserCallback() {
                     @Override
                     public void onCompleted(GraphUser user,
