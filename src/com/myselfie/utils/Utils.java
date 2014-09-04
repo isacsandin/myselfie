@@ -1,9 +1,27 @@
 package com.myselfie.utils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
-import com.myselfie.myselfie.ui.MyApp;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,6 +34,8 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+
+import com.myselfie.myselfie.ui.MyApp;
 
 public class Utils {
 	public static final String BOLD_FONT_PATH = "fonts/Montserrat-Bold.ttf";
@@ -80,16 +100,16 @@ public class Utils {
 		} catch (Exception ex) {
 		}
 	}
-	
-	public static Bitmap GetImageFromAssets(Context context,String imagePath){
+
+	public static Bitmap GetImageFromAssets(Context context, String imagePath) {
 		Bitmap bmp = null;
 		try {
-	        InputStream bitmap= context.getAssets().open(imagePath);
-	        bmp = BitmapFactory.decodeStream(bitmap);
+			InputStream bitmap = context.getAssets().open(imagePath);
+			bmp = BitmapFactory.decodeStream(bitmap);
 
-	    } catch (Exception e1) {
-	    	Log.d("Application Find", e1.getMessage());
-	    }
+		} catch (Exception e1) {
+			Log.d("Application Find", e1.getMessage());
+		}
 		return bmp;
 	}
 }

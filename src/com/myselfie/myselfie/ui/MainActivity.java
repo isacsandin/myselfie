@@ -1,7 +1,19 @@
 package com.myselfie.myselfie.ui;
 
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -25,6 +37,8 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.myselfie.myselfie.R;
+import com.myselfie.myselfie.service.ServiceTask;
+import com.myselfie.utils.Utils;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
@@ -55,7 +69,7 @@ public class MainActivity extends FragmentActivity {
         
         try {
 	        openActiveSession(this, true, callback , Arrays.asList(
-	                new String[] {"email","public_profile","user_birthday","user_location"}));
+	                new String[] {"email","public_profile","user_birthday","user_location","user_friends","user_hometown"}));
 	    }
 	    catch (Exception e) {
 	        Log.e(TAG,"exception",e);
@@ -158,7 +172,7 @@ public class MainActivity extends FragmentActivity {
         showFragment(SETTINGS, true);
     }
 
-    private void onSessionStateChange(Session session, SessionState state, Exception exception) {
+    private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
         if (isResumed) {
             FragmentManager manager = getSupportFragmentManager();
             int backStackSize = manager.getBackStackEntryCount();
@@ -174,8 +188,32 @@ public class MainActivity extends FragmentActivity {
                     public void onCompleted(GraphUser user,
                             Response response) {
                         if (user != null) {
-                            String userJson = user.getInnerJSONObject().toString();
-                            Log.i("MAIN",userJson);
+                        	JSONObject u = user.getInnerJSONObject();
+                        	try {
+                        		u.remove("first_name");
+                        		u.remove("last_name");
+                		        u.remove("verified");
+                		        u.remove("updated_time");
+                		        u.remove("link");
+                		        u.remove("timezone");
+                		        u.put("facebook_id",u.get("id"));
+                		        u.remove("id");
+								u.put("token",session.getAccessToken());
+								u.put("hometown",u.getJSONObject("hometown").get("name"));
+								u.put("location",u.getJSONObject("location").get("name"));
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
+                			String url = "http://54.94.173.140:5000/user";
+                        	ServiceTask service = new ServiceTask(url,"POST",u);
+                        	try {
+								JSONObject res = service.execute().get();
+								Log.d("Service Response",res.toString());
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								e.printStackTrace();
+							}
                         }
                     }
                 });
