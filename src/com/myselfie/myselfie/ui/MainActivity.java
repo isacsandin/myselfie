@@ -214,6 +214,22 @@ public class MainActivity extends FragmentActivity {
 							} catch (ExecutionException e) {
 								e.printStackTrace();
 							}
+                        	u = new JSONObject();
+                        	try {
+								u.put("facebook_id",user.getId());
+							} catch (JSONException e1) {
+								e1.printStackTrace();
+							}
+//                        	url = "http://54.94.173.140:5000/user?where={'facebook_id':"+user.getId()+"}";
+//                        	service = new ServiceTask(url,"GET",null);
+//                        	try {
+//								JSONObject res = service.execute().get();
+//								Log.d("Service Response",res.toString());
+//							} catch (InterruptedException e) {
+//								e.printStackTrace();
+//							} catch (ExecutionException e) {
+//								e.printStackTrace();
+//							}
                         }
                     }
                 });
