@@ -38,7 +38,7 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.myselfie.myselfie.R;
 import com.myselfie.myselfie.service.ServiceTask;
-import com.myselfie.utils.Utils;
+import com.myselfie.myselfie.utils.Utils;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";

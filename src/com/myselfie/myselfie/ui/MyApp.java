@@ -1,9 +1,9 @@
 package com.myselfie.myselfie.ui;
 
-import com.myselfie.utils.Utils;
-
 import android.app.Application;
 import android.content.Context;
+
+import com.myselfie.myselfie.utils.Utils;
 
 
 public class MyApp extends Application {

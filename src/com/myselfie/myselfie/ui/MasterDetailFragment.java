@@ -23,7 +23,7 @@ import com.myselfie.myselfie.R;
 import com.myselfie.myselfie.adapter.MasterDetailAdapter;
 import com.myselfie.myselfie.model.VideoItem;
 import com.myselfie.myselfie.model.VideoList;
-import com.myselfie.utils.Utils;
+import com.myselfie.myselfie.utils.Utils;
 
 public class MasterDetailFragment extends Fragment implements
 		OnItemClickListener, OnClickListener {

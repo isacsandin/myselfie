@@ -1,4 +1,4 @@
-package com.myselfie.utils;
+package com.myselfie.myselfie.utils;
 
 import java.io.BufferedReader;
 import java.io.IOException;

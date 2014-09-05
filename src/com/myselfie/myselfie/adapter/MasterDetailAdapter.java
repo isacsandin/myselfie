@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.myselfie.myselfie.R;
 import com.myselfie.myselfie.model.VideoItem;
-import com.myselfie.utils.Utils;
+import com.myselfie.myselfie.utils.Utils;
 
 @SuppressLint("InflateParams")
 public class MasterDetailAdapter extends ArrayAdapter<VideoItem> {
