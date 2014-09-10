@@ -1,6 +1,7 @@
 package com.myselfie.myselfie.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import com.myselfie.myselfie.R;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.entities.Album;
+import com.sromku.simple.fb.listeners.OnAlbumsListener;
 import com.sromku.simple.fb.listeners.OnPublishListener;
 
 @SuppressLint("InflateParams")
@@ -51,17 +53,43 @@ public class TabsFragment extends Fragment {
         mTabManager.addTab(R.string.lbl_check_list, R.drawable.ico_check,MasterDetailFragment.class, savedInstanceState);
         mTabManager.addTab(R.string.lbl_settings, R.drawable.ico_settings,SettingsFragment.class,savedInstanceState);
         
-        Album album = new Album.Builder()
-        .setName("MySelfie")
-        .setMessage("Album create by Myselfie Application to store my photos")
-        .build();
-        
-        mSimpleFacebook.publish(album, new OnPublishListener() {
+    	// recupera a lista de albuns
+    	OnAlbumsListener onAlbumsListener = new OnAlbumsListener() {            
             @Override
-            public void onComplete(String id) {
-                Log.i(TAG, "Published successfully. id = " + id);
+            public void onComplete(List<Album> albums) {
+                Log.i(TAG, "Number of albums = " + albums.size());
             }
-        });
+
+            /* 
+             * You can override other methods here: 
+             * onThinking(), onFail(String reason), onException(Throwable throwable)
+             */ 
+            
+            @Override
+            public void onFail(String reason) {
+            	Log.i(TAG, "Album falhou = " + reason);
+            }
+            
+            @Override
+            public void onException(Throwable throwable) {
+            	Log.i(TAG, "Album disparou exeção = " + throwable);
+            }
+        };
+        
+        mSimpleFacebook.getAlbums(onAlbumsListener);
+        
+     // cria o album MySelfie
+//    	Album album = new Album.Builder()
+//    	.setName("MySelfie")
+//    	.setMessage("Album create by Myselfie Application to store my photos")
+//    	.build();
+//    	
+//    	mSimpleFacebook.publish(album, new OnPublishListener() {
+//    		@Override
+//    		public void onComplete(String id) {
+//    			Log.i(TAG, "Published successfully. id = " + id);
+//    		}
+//    	});
         
         return v;
     }

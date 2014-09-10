@@ -1,5 +1,6 @@
 package com.myselfie.myselfie.ui;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.json.JSONException;
@@ -24,7 +25,10 @@ import com.facebook.model.GraphUser;
 import com.myselfie.myselfie.R;
 import com.myselfie.myselfie.service.ServiceTask;
 import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.entities.Album;
+import com.sromku.simple.fb.listeners.OnAlbumsListener;
 import com.sromku.simple.fb.listeners.OnLogoutListener;
+import com.sromku.simple.fb.listeners.OnPublishListener;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
@@ -71,7 +75,6 @@ public class MainActivity extends FragmentActivity {
             // otherwise present the splash screen and ask the user to login, unless the user explicitly skipped.
             showFragment(SPLASH, false);
         }
-        
         
        
     }
