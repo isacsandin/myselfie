@@ -26,12 +26,11 @@ public class SettingsFragment extends Fragment {
 		mSimpleFacebook = SimpleFacebook.getInstance(this.getActivity());
 		mButtonLogout = (Button) view.findViewById(R.id.logout_button);
 		
-		mButtonLogout.setText("Login via Facebook");		
+		mButtonLogout.setText("Logout");		
 		mButtonLogout.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				// logout listener
-				OnLogoutListener onLogoutListener = new OnLogoutListener() {
+			public void onClick(View v) {				
+				mSimpleFacebook.logout(new OnLogoutListener() {
 				    @Override
 				    public void onLogout() {
 				        Log.i(TAG, "You are logged out");
@@ -51,9 +50,7 @@ public class SettingsFragment extends Fragment {
 					public void onFail(String reason) {
 						// TODO Auto-generated method stub
 					}
-				};
-				
-				mSimpleFacebook.logout(onLogoutListener);
+				});
 			}
 		});
 		
