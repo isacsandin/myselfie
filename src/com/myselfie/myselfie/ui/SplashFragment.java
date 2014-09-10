@@ -41,7 +41,7 @@ public class SplashFragment extends Fragment {
 		View view = inflater
 				.inflate(R.layout.fragment_splash, container, false);
 
-		mSimpleFacebook = SimpleFacebook.getInstance();
+		mSimpleFacebook = SimpleFacebook.getInstance(this.getActivity());
 
 		mButtonLogin = (Button) view.findViewById(R.id.login_button);
 		

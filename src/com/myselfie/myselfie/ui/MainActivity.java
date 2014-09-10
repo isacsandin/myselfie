@@ -30,6 +30,8 @@ public class MainActivity extends FragmentActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        setContentView(R.layout.activity_main);
+        
         FragmentManager fm = getSupportFragmentManager();
         fragments[SPLASH] = fm.findFragmentById(R.id.splashFragment);
         fragments[MAIN] = fm.findFragmentById(R.id.mainFragment);
@@ -41,7 +43,7 @@ public class MainActivity extends FragmentActivity {
         }
         transaction.commit();
         
-        mSimpleFacebook = SimpleFacebook.getInstance();
+        mSimpleFacebook = SimpleFacebook.getInstance(this);
         Session session = mSimpleFacebook.getSession();
 
         if (session != null && session.isOpened()) {
