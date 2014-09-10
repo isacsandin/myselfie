@@ -6,8 +6,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
-import com.facebook.widget.LoginButton;
 import com.myselfie.myselfie.R;
 
 public class SettingsFragment extends Fragment {
@@ -15,8 +15,8 @@ public class SettingsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_setings, container, false);
-		LoginButton authButton = (LoginButton) view.findViewById(R.id.authButton);
-		authButton.setFragment(this);
+		Button authButton = (Button) view.findViewById(R.id.authButton);
+		//authButton.setFragment(this);
 		return view;
 	}
 
