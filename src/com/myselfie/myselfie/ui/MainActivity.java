@@ -1,18 +1,30 @@
 package com.myselfie.myselfie.ui;
 
+import java.util.concurrent.ExecutionException;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.AppEventsLogger;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.SessionState;
+import com.facebook.model.GraphUser;
 import com.myselfie.myselfie.R;
+import com.myselfie.myselfie.service.ServiceTask;
 import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.listeners.OnLogoutListener;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
@@ -25,6 +37,12 @@ public class MainActivity extends FragmentActivity {
     private MenuItem settings;
 	private boolean isResumed = false;
     private SimpleFacebook mSimpleFacebook;
+    private Session.StatusCallback callback = new Session.StatusCallback() {
+        @Override
+        public void call(Session session, SessionState state, Exception exception) {
+            onSessionStateChange(session, state, exception);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +72,7 @@ public class MainActivity extends FragmentActivity {
             showFragment(SPLASH, false);
         }
         
+        
        
     }
 
@@ -80,7 +99,8 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-    	mSimpleFacebook.onActivityResult(this, requestCode, resultCode, data); 
+    	mSimpleFacebook.onActivityResult(this, requestCode, resultCode, data);
+    	mSimpleFacebook.getSession().addCallback(callback);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -136,6 +156,24 @@ public class MainActivity extends FragmentActivity {
         showFragment(SETTINGS, true);
     }
 
+    private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
+        if (isResumed) {
+            FragmentManager manager = getSupportFragmentManager();
+            int backStackSize = manager.getBackStackEntryCount();
+            for (int i = 0; i < backStackSize; i++) {
+                manager.popBackStack();
+            }
+            // check for the OPENED state instead of session.isOpened() since for the
+            // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
+            if (state.equals(SessionState.OPENED)) {
+                showFragment(MAIN, false);
+            } else if (state.isClosed()) {
+                showFragment(SPLASH, false);
+            }
+        }
+    }
+    
+    
 //    private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
 //        if (isResumed) {
 //            FragmentManager manager = getSupportFragmentManager();
@@ -210,6 +248,7 @@ public class MainActivity extends FragmentActivity {
 //            }
 //        }
 //    }
+    
 
     private void showFragment(int fragmentIndex, boolean addToBackStack) {
         FragmentManager fm = getSupportFragmentManager();

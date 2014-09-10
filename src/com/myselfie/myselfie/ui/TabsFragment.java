@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,17 +19,25 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 
 import com.myselfie.myselfie.R;
+import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.entities.Album;
+import com.sromku.simple.fb.listeners.OnPublishListener;
 
 @SuppressLint("InflateParams")
 public class TabsFragment extends Fragment {
+	private static final String TAG = "TabsFragment";
     TabManager mTabManager;
     TextView statusText;
+    private SimpleFacebook mSimpleFacebook;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTabManager = new TabManager(getActivity(), getChildFragmentManager(),
                 R.id.realtabcontent);
+        
+        mSimpleFacebook = SimpleFacebook.getInstance(this.getActivity());        
     }
 
     @Override
@@ -41,6 +50,18 @@ public class TabsFragment extends Fragment {
         mTabManager.addTab(R.string.lbl_swipe, R.drawable.ico_list, MasterDetailFragment.class,savedInstanceState);
         mTabManager.addTab(R.string.lbl_check_list, R.drawable.ico_check,MasterDetailFragment.class, savedInstanceState);
         mTabManager.addTab(R.string.lbl_settings, R.drawable.ico_settings,SettingsFragment.class,savedInstanceState);
+        
+        Album album = new Album.Builder()
+        .setName("MySelfie")
+        .setMessage("Album create by Myselfie Application to store my photos")
+        .build();
+        
+        mSimpleFacebook.publish(album, new OnPublishListener() {
+            @Override
+            public void onComplete(String id) {
+                Log.i(TAG, "Published successfully. id = " + id);
+            }
+        });
         
         return v;
     }
