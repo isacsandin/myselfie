@@ -1,34 +1,19 @@
 package com.myselfie.myselfie.ui;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.AppEventsLogger;
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.SessionState;
-import com.facebook.model.GraphUser;
 import com.myselfie.myselfie.R;
-import com.myselfie.myselfie.service.ServiceTask;
 import com.sromku.simple.fb.SimpleFacebook;
-import com.sromku.simple.fb.entities.Album;
-import com.sromku.simple.fb.listeners.OnAlbumsListener;
-import com.sromku.simple.fb.listeners.OnLogoutListener;
-import com.sromku.simple.fb.listeners.OnPublishListener;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
