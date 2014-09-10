@@ -1,44 +1,18 @@
 package com.myselfie.myselfie.ui;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.AppEventsLogger;
-import com.facebook.Request;
-import com.facebook.Response;
 import com.facebook.Session;
-import com.facebook.Session.Builder;
-import com.facebook.Session.OpenRequest;
-import com.facebook.Session.StatusCallback;
-import com.facebook.SessionState;
-import com.facebook.UiLifecycleHelper;
-import com.facebook.model.GraphUser;
 import com.myselfie.myselfie.R;
-import com.myselfie.myselfie.service.ServiceTask;
-import com.myselfie.myselfie.utils.Utils;
+import com.sromku.simple.fb.SimpleFacebook;
 
 public class MainActivity extends FragmentActivity {
 	private static final String TAG = "MainActivity";
@@ -49,50 +23,42 @@ public class MainActivity extends FragmentActivity {
 
     private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
     private MenuItem settings;
-    private boolean isResumed = false;
-    private UiLifecycleHelper uiHelper;
-    private Session.StatusCallback callback = new Session.StatusCallback() {
-        @Override
-        public void call(Session session, SessionState state, Exception exception) {
-            onSessionStateChange(session, state, exception);
-        }
-    };
+	private boolean isResumed = false;
+    private SimpleFacebook mSimpleFacebook;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        uiHelper = new UiLifecycleHelper(this, callback);
-        uiHelper.onCreate(savedInstanceState);
-
-        setContentView(R.layout.activity_main);
         
-        try {
-	        openActiveSession(this, true, callback , Arrays.asList(
-	                new String[] {"email","public_profile","user_birthday","user_location","user_friends","user_hometown"}));
-	    }
-	    catch (Exception e) {
-	        Log.e(TAG,"exception",e);
-	    }
-
         FragmentManager fm = getSupportFragmentManager();
-        SplashFragment splashFragment = (SplashFragment) fm.findFragmentById(R.id.splashFragment);
-        fragments[SPLASH] = splashFragment;
+        fragments[SPLASH] = fm.findFragmentById(R.id.splashFragment);
         fragments[MAIN] = fm.findFragmentById(R.id.mainFragment);
         fragments[SETTINGS] = fm.findFragmentById(R.id.settingsFragment);
-
+      
         FragmentTransaction transaction = fm.beginTransaction();
         for(int i = 0; i < fragments.length; i++) {
             transaction.hide(fragments[i]);
         }
         transaction.commit();
+        
+        mSimpleFacebook = SimpleFacebook.getInstance();
+        Session session = mSimpleFacebook.getSession();
 
+        if (session != null && session.isOpened()) {
+            // if the session is already open, try to show the selection fragment
+            showFragment(MAIN, false);
+        } else {
+            // otherwise present the splash screen and ask the user to login, unless the user explicitly skipped.
+            showFragment(SPLASH, false);
+        }
+        
+       
     }
 
     @Override
     public void onResume() {
+        mSimpleFacebook = SimpleFacebook.getInstance(this);
         super.onResume();
-        uiHelper.onResume();
         isResumed = true;
 
         // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.  Do so in
@@ -103,7 +69,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     public void onPause() {
         super.onPause();
-        uiHelper.onPause();
         isResumed = false;
 
         // Call the 'deactivateApp' method to log an app event for use in analytics and advertising
@@ -113,27 +78,24 @@ public class MainActivity extends FragmentActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	mSimpleFacebook.onActivityResult(this, requestCode, resultCode, data); 
         super.onActivityResult(requestCode, resultCode, data);
-        uiHelper.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        uiHelper.onDestroy();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        uiHelper.onSaveInstanceState(outState);
-
     }
 
     @Override
     protected void onResumeFragments() {
         super.onResumeFragments();
-        Session session = Session.getActiveSession();
+        Session session = mSimpleFacebook.getSession();
 
         if (session != null && session.isOpened()) {
             // if the session is already open, try to show the selection fragment
@@ -172,56 +134,38 @@ public class MainActivity extends FragmentActivity {
         showFragment(SETTINGS, true);
     }
 
-    private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
-        if (isResumed) {
-            FragmentManager manager = getSupportFragmentManager();
-            int backStackSize = manager.getBackStackEntryCount();
-            for (int i = 0; i < backStackSize; i++) {
-                manager.popBackStack();
-            }
-            // check for the OPENED state instead of session.isOpened() since for the
-            // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
-            if (state.equals(SessionState.OPENED)) {
-                showFragment(MAIN, false);
-                Request request = Request.newMeRequest(session,new Request.GraphUserCallback() {
-                    @Override
-                    public void onCompleted(GraphUser user,
-                            Response response) {
-                        if (user != null) {
-                        	JSONObject u = user.getInnerJSONObject();
-                        	try {
-                        		u.remove("first_name");
-                        		u.remove("last_name");
-                		        u.remove("verified");
-                		        u.remove("updated_time");
-                		        u.remove("link");
-                		        u.remove("timezone");
-                		        u.put("facebook_id",u.get("id"));
-                		        u.remove("id");
-								u.put("token",session.getAccessToken());
-								u.put("hometown",u.getJSONObject("hometown").get("name"));
-								u.put("location",u.getJSONObject("location").get("name"));
-							} catch (JSONException e) {
-								e.printStackTrace();
-							}
-                			String url = "http://54.94.173.140:5000/user";
-                        	ServiceTask service = new ServiceTask(url,"POST",u);
-                        	try {
-								JSONObject res = service.execute().get();
-								Log.d("Service Response",res.toString());
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							} catch (ExecutionException e) {
-								e.printStackTrace();
-							}
-                        	u = new JSONObject();
-                        	try {
-								u.put("facebook_id",user.getId());
-							} catch (JSONException e1) {
-								e1.printStackTrace();
-							}
-//                        	url = "http://54.94.173.140:5000/user?where={'facebook_id':"+user.getId()+"}";
-//                        	service = new ServiceTask(url,"GET",null);
+//    private void onSessionStateChange(final Session session, SessionState state, Exception exception) {
+//        if (isResumed) {
+//            FragmentManager manager = getSupportFragmentManager();
+//            int backStackSize = manager.getBackStackEntryCount();
+//            for (int i = 0; i < backStackSize; i++) {
+//                manager.popBackStack();
+//            }
+//            // check for the OPENED state instead of session.isOpened() since for the
+//            // OPENED_TOKEN_UPDATED state, the selection fragment should already be showing.
+//            if (state.equals(SessionState.OPENED)) {
+//                showFragment(MAIN, false);
+//                Request request = Request.newMeRequest(session,new Request.GraphUserCallback() {
+//                    @Override
+//                    public void onCompleted(GraphUser user,
+//                            Response response) {
+//                        if (user != null) {
+//                        	JSONObject u = user.getInnerJSONObject();
+//                        	try {
+//                        		u.remove("first_name");
+//                        		u.remove("last_name");
+//                		        u.remove("verified");
+//                		        u.remove("updated_time");
+//                		        u.remove("link");
+//                		        u.remove("timezone");
+//								u.put("token",session.getAccessToken());
+//								u.put("hometown",u.getJSONObject("hometown").get("name"));
+//								u.put("location",u.getJSONObject("location").get("name"));
+//							} catch (JSONException e) {
+//								e.printStackTrace();
+//							}
+//                			String url = "http://54.94.173.140:5000/user";
+//                        	ServiceTask service = new ServiceTask(url,"POST",u);
 //                        	try {
 //								JSONObject res = service.execute().get();
 //								Log.d("Service Response",res.toString());
@@ -230,16 +174,40 @@ public class MainActivity extends FragmentActivity {
 //							} catch (ExecutionException e) {
 //								e.printStackTrace();
 //							}
-                        }
-                    }
-                });
-                Request.executeBatchAsync(request);
-                //Log.i("MAIN",session.getAccessToken());
-            } else if (state.isClosed()) {
-                showFragment(SPLASH, false);
-            }
-        }
-    }
+//                        	u = new JSONObject();
+//                        	try {
+//								u.put("facebook_id",user.getId());
+//							} catch (JSONException e1) {
+//								e1.printStackTrace();
+//							}
+//                        	JSONObject jo = new JSONObject();
+//                        	try {
+//								jo.put("where","id==\"696453710430494\"");
+//							} catch (JSONException e1) {
+//								// TODO Auto-generated catch block
+//								e1.printStackTrace();
+//							}
+//                        	url = "http://54.94.173.140:5000/user";
+//                        	service = new ServiceTask(url,"GET",jo);
+//                        	try {
+//								JSONObject res = service.execute().get();
+//								Log.d("Service Response",res.toString());
+//							} catch (InterruptedException e) {
+//								e.printStackTrace();
+//							} catch (ExecutionException e) {
+//								e.printStackTrace();
+//							}
+//                        }
+//                    }
+//                });
+//                
+//                
+//                Request.executeBatchAsync(request);
+//            } else if (state.isClosed()) {
+//                showFragment(SPLASH, false);
+//            }
+//        }
+//    }
 
     private void showFragment(int fragmentIndex, boolean addToBackStack) {
         FragmentManager fm = getSupportFragmentManager();
@@ -256,17 +224,4 @@ public class MainActivity extends FragmentActivity {
         }
         transaction.commit();
     }
-    
-	private static Session openActiveSession(Activity activity, boolean allowLoginUI, StatusCallback callback, List<String> permissions) {
-	    OpenRequest openRequest = new OpenRequest(activity).setPermissions(permissions).setCallback(callback);
-	    Session session = new Builder(activity).build();
-	    if (SessionState.CREATED_TOKEN_LOADED.equals(session.getState()) || allowLoginUI) {
-	        Session.setActiveSession(session);
-	        session.openForRead(openRequest);
-	        return session;
-	    }
-	    return null;
-	}
-	
-
 }

@@ -6,13 +6,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URLEncodedUtils;
@@ -67,13 +67,15 @@ public class ServiceTask extends AsyncTask<String, String, JSONObject> {
 
 			} else if (method == "GET") {
 				DefaultHttpClient httpClient = new DefaultHttpClient();
-				String [] names = JSONObject.getNames(postparams);
+				Iterator<String> it = postparams.keys();
 				List<NameValuePair> par = new ArrayList<NameValuePair>();
-				for(int i = 0; i<names.length; i++){
-					par.add(new BasicNameValuePair(names[i],postparams.optString(names[i])));
+				while(it.hasNext()){
+					String key = it.next();
+					par.add(new BasicNameValuePair(key,postparams.optString(key)));
 				}
 				String paramString = URLEncodedUtils.format(par, "utf-8");
 				url += "?" + paramString;
+				Log.d("Service query",url);
 				HttpGet httpGet = new HttpGet(url);
 				httpGet.setHeader("Accept", "application/json");
 
