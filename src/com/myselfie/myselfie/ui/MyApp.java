@@ -33,7 +33,8 @@ public class MyApp extends Application {
         	    Permission.USER_LOCATION,
         	    Permission.USER_FRIENDS,
         	    Permission.USER_HOMETOWN,
-        	    Permission.PUBLISH_ACTION
+        	    Permission.PUBLISH_ACTION,
+        	    Permission.USER_PHOTOS
         	};
         SimpleFacebookConfiguration configuration = new SimpleFacebookConfiguration.Builder()
         .setAppId(getString(R.string.app_id))
