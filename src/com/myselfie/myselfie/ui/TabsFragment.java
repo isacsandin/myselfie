@@ -5,11 +5,11 @@ import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +23,9 @@ import android.widget.TextView;
 import com.myselfie.myselfie.R;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.entities.Album;
+import com.sromku.simple.fb.entities.Photo;
 import com.sromku.simple.fb.listeners.OnAlbumsListener;
 import com.sromku.simple.fb.listeners.OnPublishListener;
-import com.sromku.simple.fb.utils.Utils;
 
 @SuppressLint("InflateParams")
 public class TabsFragment extends Fragment {
@@ -54,20 +54,7 @@ public class TabsFragment extends Fragment {
         mTabManager.addTab(R.string.lbl_swipe, R.drawable.ico_list, MasterDetailFragment.class,savedInstanceState);
         mTabManager.addTab(R.string.lbl_check_list, R.drawable.ico_check,MasterDetailFragment.class, savedInstanceState);
         mTabManager.addTab(R.string.lbl_settings, R.drawable.ico_settings,SettingsFragment.class,savedInstanceState);
-              
-     // cria o album MySelfie
-//    	Album album = new Album.Builder()
-//    	.setName("MySelfie")
-//    	.setMessage("Album create by Myselfie Application to store my photos")
-//    	.build();
-//    	
-//    	mSimpleFacebook.publish(album, new OnPublishListener() {
-//    		@Override
-//    		public void onComplete(String id) {
-//    			Log.i(TAG, "Published successfully. id = " + id);
-//    		}
-//    	});
-        
+                      
         mSimpleFacebook.getAlbums(new OnAlbumsListener() {
 
 			@Override
@@ -83,8 +70,61 @@ public class TabsFragment extends Fragment {
 			@Override
 			public void onComplete(List<Album> response) {
 				Log.i(TAG, "Number of albums = " + response.size());
+				Boolean hasAlbum = false;
+				String albumId = "";
 				for(Album a: response){
-					Log.i(TAG, " name = " + a.getName());
+					if(a.getName().compareToIgnoreCase("myselfie") == 0){
+						hasAlbum = true;
+						albumId = a.getId();
+					}
+				}
+				if(!hasAlbum){
+				    //  cria o album MySelfie
+			    	Album album = new Album.Builder()
+			    	.setName("MySelfie")
+			    	.setMessage("Album create by Myselfie Application to store my photos")
+			    	.build();
+			    	
+			    	mSimpleFacebook.publish(album, new OnPublishListener() {
+			    		@Override
+			    		public void onComplete(String id) {
+			    			Log.i(TAG, "Published successfully. id = " + id);
+			    			Photo photo = new Photo.Builder()
+						    .setImage(new BitmapFactory().decodeResource(getResources(),R.drawable.brave))
+						    .setName("Submit Photo to facebook")
+						    .build();
+							
+							mSimpleFacebook.publish(photo,id, new OnPublishListener() {
+							    @Override
+							    public void onComplete(String id) {
+							        Log.i(TAG, "Published successfully. id = " + id);
+							    }
+
+							    /* 
+							     * You can override other methods here: 
+							     * onThinking(), onFail(String reason), onException(Throwable throwable)
+							     */
+							});
+			    		}
+			    	});
+				}
+				else{
+					Photo photo = new Photo.Builder()
+				    .setImage(new BitmapFactory().decodeResource(getResources(),R.drawable.brave))
+				    .setName("Submit Photo to facebook")
+				    .build();
+					
+					mSimpleFacebook.publish(photo,albumId , new OnPublishListener() {
+					    @Override
+					    public void onComplete(String id) {
+					        Log.i(TAG, "Published successfully. id = " + id);
+					    }
+
+					    /* 
+					     * You can override other methods here: 
+					     * onThinking(), onFail(String reason), onException(Throwable throwable)
+					     */
+					});
 				}
 			}
 		});
