@@ -79,7 +79,6 @@ public class SplashFragment extends Fragment {
 						Log.i(TAG, "Logged in");
 					}
 				});
-				
 			}
 		});
 		return view;
