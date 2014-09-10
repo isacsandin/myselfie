@@ -54,32 +54,7 @@ public class TabsFragment extends Fragment {
         mTabManager.addTab(R.string.lbl_swipe, R.drawable.ico_list, MasterDetailFragment.class,savedInstanceState);
         mTabManager.addTab(R.string.lbl_check_list, R.drawable.ico_check,MasterDetailFragment.class, savedInstanceState);
         mTabManager.addTab(R.string.lbl_settings, R.drawable.ico_settings,SettingsFragment.class,savedInstanceState);
-        
-//    	// recupera a lista de albuns
-//    	OnAlbumsListener onAlbumsListener = new OnAlbumsListener() {            
-//            @Override
-//            public void onComplete(List<Album> albums) {
-//                Log.i(TAG, "Number of albums = " + albums.size());
-//            }
-//
-//            /* 
-//             * You can override other methods here: 
-//             * onThinking(), onFail(String reason), onException(Throwable throwable)
-//             */ 
-//            
-//            @Override
-//            public void onFail(String reason) {
-//            	Log.i(TAG, "Album falhou = " + reason);
-//            }
-//            
-//            @Override
-//            public void onException(Throwable throwable) {
-//            	Log.i(TAG, "Album disparou exeção = " + throwable);
-//            }
-//        };
-//        
-//        mSimpleFacebook.getAlbums(onAlbumsListener);
-        
+              
      // cria o album MySelfie
 //    	Album album = new Album.Builder()
 //    	.setName("MySelfie")
@@ -93,7 +68,7 @@ public class TabsFragment extends Fragment {
 //    		}
 //    	});
         
-        SimpleFacebook.getInstance().getAlbums(new OnAlbumsListener() {
+        mSimpleFacebook.getAlbums(new OnAlbumsListener() {
 
 			@Override
 			public void onException(Throwable throwable) {
@@ -108,11 +83,11 @@ public class TabsFragment extends Fragment {
 			@Override
 			public void onComplete(List<Album> response) {
 				Log.i(TAG, "Number of albums = " + response.size());
+				for(Album a: response){
+					Log.i(TAG, " name = " + a.getName());
+				}
 			}
 		});
-        
-        
-        
         return v;
     }
 
