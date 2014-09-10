@@ -9,7 +9,7 @@
     <dimen name="tex_size_large">16sp</dimen>
     <dimen name="tex_size_xlarge">18sp</dimen>
     <dimen name="tex_size_xxlarge">20sp</dimen>
-    <dimen name="height">40dp</dimen>
+    <dimen name="height">48dp</dimen>
     <dimen name="width">60dp</dimen>
     <dimen name="dim_5">5dp</dimen>
     <dimen name="dim_10">10dp</dimen>
