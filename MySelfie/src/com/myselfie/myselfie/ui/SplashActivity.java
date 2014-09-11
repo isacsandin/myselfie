@@ -3,36 +3,70 @@ package com.myselfie.myselfie.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
- 
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+import com.sromku.simple.fb.Permission.Type;
+import com.sromku.simple.fb.SimpleFacebook;
+import com.sromku.simple.fb.listeners.OnLoginListener;
+
 public class SplashActivity extends Activity {
- 
-    // Splash screen timer
-    private static int SPLASH_TIME_OUT = 3000;
- 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
- 
-        new Handler().postDelayed(new Runnable() {
- 
-            /*
-             * Showing splash screen with a timer. This will be useful when you
-             * want to show case your app logo / company
-             */
- 
-            @Override
-            public void run() {
-                // This method will be executed once the timer is over
-                // Start your app main activity
-                Intent i = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(i);
- 
-                // close this activity
-                finish();
-            }
-        }, SPLASH_TIME_OUT);
-    }
- 
+	private static final String TAG = "SplashActivity";
+	private SimpleFacebook mSimpleFacebook;
+	private Button mButtonLogin;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_splash);
+
+		mSimpleFacebook = SimpleFacebook.getInstance(this);
+
+		mButtonLogin = (Button) findViewById(R.id.login_button);
+
+		mButtonLogin.setText("Login via Facebook");		
+		mButtonLogin.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				mSimpleFacebook.login(new OnLoginListener() {
+					@Override
+					public void onFail(String arg0) {
+						Log.w(TAG,
+								String.format("You didn't accept %s permissions", arg0));
+					}
+
+					@Override
+					public void onException(Throwable arg0) {
+						Log.e(TAG, "excemtion", arg0);
+					}
+
+					@Override
+					public void onThinking() {
+						Log.i(TAG, "User thinking");
+					}
+
+					@Override
+					public void onNotAcceptingPermissions(Type arg0) {
+						Log.w(TAG,
+								String.format("You didn't accept %s permissions",
+										arg0.name()));
+					}
+
+					@Override
+					public void onLogin() {
+						Log.i(TAG, "Logged in");
+										
+					    startActivity(new Intent(getBaseContext(), MainActivity.class));
+					    finish();
+					}
+				});
+			}
+		});
+
+
+	}
+
 }
