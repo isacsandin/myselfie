@@ -1,6 +1,8 @@
-package com.myselfie.myselfie_v2;
+package com.myselfie.ui;
 
 import java.util.Locale;
+
+import com.myselfie.myselfie_v2.R;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
