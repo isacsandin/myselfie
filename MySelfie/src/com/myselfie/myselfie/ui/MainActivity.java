@@ -88,7 +88,7 @@ public class MainActivity extends SherlockFragmentActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	   // Handle item selection
 	   switch (item.getItemId()) {
-	      case R.id.add_item:
+	      case R.id.camera_item:
 	         // do s.th.
 	         return true;
 	      case R.id.about:

@@ -9,11 +9,11 @@ import com.sromku.simple.fb.SimpleFacebookConfiguration;
 import com.sromku.simple.fb.utils.Logger;
 
 
-public class MySelfieApp extends Application {
+public class App extends Application {
 
-	private static MySelfieApp instance;
+	private static App instance;
 
-	public MySelfieApp() {
+	public App() {
 		super();
 		instance = this;
 	}
@@ -42,7 +42,7 @@ public class MySelfieApp extends Application {
         SimpleFacebook.setConfiguration(configuration);
 	}
 
-	public static MySelfieApp getApp() {
+	public static App getApp() {
 		return instance;
 	}
 

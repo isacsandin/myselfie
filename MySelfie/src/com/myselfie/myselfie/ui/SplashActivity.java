@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
+import com.facebook.Session;
 import com.sromku.simple.fb.Permission.Type;
 import com.sromku.simple.fb.SimpleFacebook;
 import com.sromku.simple.fb.listeners.OnLoginListener;
@@ -16,6 +17,8 @@ public class SplashActivity extends Activity {
 	private static final String TAG = "SplashActivity";
 	private SimpleFacebook mSimpleFacebook;
 	private Button mButtonLogin;
+	private Button mButtonLoginAnyway;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -23,8 +26,18 @@ public class SplashActivity extends Activity {
 		setContentView(R.layout.activity_splash);
 
 		mSimpleFacebook = SimpleFacebook.getInstance(this);
+		
+		Session session = mSimpleFacebook.getSession();
+		if(session!=null && session.isOpened()){
+			Log.i(TAG, "Session valid, proceding to main activity");
+			startActivity(new Intent(getBaseContext(), MainActivity.class));
+		    finish();
+		}
 
 		mButtonLogin = (Button) findViewById(R.id.login_button);
+		
+		mButtonLoginAnyway = (Button) findViewById(R.id.login_anyway);
+
 
 		mButtonLogin.setText("Login via Facebook");		
 		mButtonLogin.setOnClickListener(new OnClickListener() {
@@ -34,8 +47,7 @@ public class SplashActivity extends Activity {
 				mSimpleFacebook.login(new OnLoginListener() {
 					@Override
 					public void onFail(String arg0) {
-						Log.w(TAG,
-								String.format("You didn't accept %s permissions", arg0));
+						Log.w(TAG,String.format("You didn't accept %s permissions", arg0));
 					}
 
 					@Override
@@ -46,6 +58,8 @@ public class SplashActivity extends Activity {
 					@Override
 					public void onThinking() {
 						Log.i(TAG, "User thinking");
+						startActivity(new Intent(getBaseContext(), MainActivity.class));
+						finish();
 					}
 
 					@Override
@@ -58,7 +72,6 @@ public class SplashActivity extends Activity {
 					@Override
 					public void onLogin() {
 						Log.i(TAG, "Logged in");
-										
 					    startActivity(new Intent(getBaseContext(), MainActivity.class));
 					    finish();
 					}
@@ -66,6 +79,13 @@ public class SplashActivity extends Activity {
 			}
 		});
 
+		mButtonLoginAnyway.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getBaseContext(), MainActivity.class));
+			    finish();
+			}
+		});
 
 	}
 
