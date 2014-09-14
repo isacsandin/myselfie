@@ -2,7 +2,6 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FB5820"
     android:fillViewport="true" >
 
     <LinearLayout
@@ -12,12 +11,11 @@
 
         <ImageView
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="200dp"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:contentDescription="@string/logo_description"
-            android:padding="50dp"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/ic_launcher_web" />
 
         <Button
             android:id="@+id/login_button"
